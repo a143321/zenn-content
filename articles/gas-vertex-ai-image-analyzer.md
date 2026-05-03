@@ -3,7 +3,7 @@ title: "GAS × Vertex AI (Gemini) で画像解析スクリプトを作る"
 emoji: "📷"
 type: "tech"
 topics: ["gas", "vertexai", "gemini", "googlecloud", "appsheet"]
-published: false
+published: true
 ---
 
 ## はじめに
