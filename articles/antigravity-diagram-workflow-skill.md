@@ -53,7 +53,24 @@ Workflow × Skill の設計パターン自体は GitHub Copilot や Claude Code 
 
 今回の肝は、プロセスを制御する **Workflow（手順書）** と、専門的な知識・アセットを持つ **Skill（能力・知識）** を徹底的に分離し、さらに Skill を「Mermaidの構文生成」と「ビジュアルレンダリング」の2つに分解したことです。
 
-Antigravity の Skill には **ワークスペーススコープ**（`.agent/skills/`）と **グローバルスコープ**（`~/.gemini/config/skills/`）の2種類があります。今回はどのプロジェクトでも再利用できるように **グローバルスコープ** に配置しています。
+Antigravity の **Workflow** と **Skill** には、それぞれ適用範囲に応じて「ワークスペース単位」と「グローバル単位」の2種類のスコープ（インストール先）が存在します。用途に合わせて適切なディレクトリに配置します。
+
+### ワークスペース単位（Workspace Scope）
+特定のプロジェクト（Gitリポジトリ等）の文脈でのみ有効な、カスタム手順や特有のドメイン知識をAIエージェントに与えたい場合に使用します。プロジェクトごとの開発フローや独自のルール、チーム内共有のコーディング規約を定義するのに最適です。
+*   **Workflowの配置先**: `<your-project-root>/.agent/workflows/`
+*   **Skillの配置先**: `<your-project-root>/.agent/skills/`
+
+### グローバル単位（Global Scope）
+ユーザーのホームディレクトリ配下に配置され、すべてのプロジェクトやワークスペースで共通して使える汎用的なカスタム手順や共通の能力を定義する場合に使用します。どのプロジェクトを開いていても同じコマンド（スラッシュコマンド）やスタイル定義を適用できます。
+*   **Workflowの配置先**: `~/.gemini/config/global_workflows/`
+*   **Skillの配置先**: `~/.gemini/config/skills/`
+
+:::message
+**⚠️ グローバルパスに関する注意**
+公式ドキュメント等ではグローバルスコープの配置先として `~/.gemini/antigravity/skills/` や `~/.gemini/antigravity/global_workflows/` が紹介されている場合がありますが、本動作検証環境（Antigravity IDE 2.0.3+）では `~/.gemini/config/` 配下に設定ファイルやカスタム資産が集約される仕様になっています。お使いの環境やバージョンに応じて、適宜パスを `~/.gemini/antigravity/` 等に読み替えてご対応ください。
+:::
+
+今回はどのプロジェクトでも再利用できるように、すべて **グローバルスコープ** に配置しています。
 
 ```
 ~/.gemini/config/
@@ -80,10 +97,10 @@ Antigravity の Skill には **ワークスペーススコープ**（`.agent/ski
 
 :::message
 **参考リンク**
-- [Antigravity 公式サイト](https://antigravity.google)
+- [AgentSkills.io — エージェントスキルの共有プラットフォーム](https://agentskills.io/)
+- [Antigravity Docs](https://antigravity.google/docs/getting-started)
 - [Skills ドキュメント](https://antigravity.google/docs/skills)
-- [Workflows ドキュメント](https://antigravity.google/docs/workflows)
-- [【Claude Codeから画像生成】画像生成MCPを作ってnpmに公開した](https://zenn.dev/forward/articles/11a680c4b530ab)
+- [MCP ドキュメント](https://antigravity.google/docs/mcp)
 :::
 
 ---
