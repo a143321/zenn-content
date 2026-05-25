@@ -6,25 +6,32 @@ topics: ["antigravity", "gemini", "mermaid", "ai", "プレゼン"]
 published: true
 ---
 
-:::message alert
-**【重要】Antigravity IDE バージョン要件**
-本記事で解説するグローバルスコープの配置パスや Workflow / Skill の統合機能は、**Antigravity IDE Version 2.0.3 以上（V2+）** を前提としています。古いバージョンでは動作しない、または設定パスが異なる（`~/.gemini/antigravity/`など）可能性があるため、必ずお使いの Antigravity のバージョンをご確認ください。
-:::
-
 ## はじめに
 
 技術プレゼンでシーケンス図を作るとき、こんな経験はないでしょうか：
 
 - Mermaid.js で書いたら文字切れが発生
-- AIに「図を描いて」と言たら、毎回色もレイアウトもバラバラ
+- AIに「図を描いて」と言ったら、毎回色もレイアウトもバラバラ
 - 結局 PowerPoint で手書き…
 
 この記事では、**Antigravity（Google のエージェント型 AI 開発環境）** の **Workflow** と **Skill** を使って、Mermaid コードからプレゼン品質のシーケンス図を **安定して** 生成する方法を紹介します。
 
+## 動作環境
+
+本記事の解説および動作検証は、以下の環境で行っています。
+
+*   **開発環境**: **Antigravity IDE Version 2.0.3+ (V2+)**
+*   **動作ホスト**: Linux (WSL2: Ubuntu)
+    *   Antigravity は Windows / macOS / Linux に対応しているため、他OSでも同様に動作可能ですが、本手順は Linux/WSL2 上で検証されています。
+*   **Node.js**: v18以上 (パッケージ管理: npm)
+*   **画像生成**: ビルトイン `generate_image` ツール (nanobananaモデル)
+
 :::message alert
-**実行環境**: 本記事は Linux（WSL2）環境、**Antigravity IDE Version: 2.0.3** で動作確認しています。Antigravity は Windows / macOS / Linux に対応しているため、他の OS でも同様の手順で再現可能と思われますが、未検証です。
-Workflow × Skill の設計パターン自体は GitHub Copilot や Claude Code 等にも応用できます。画像生成については、Antigravity ではビルトインの `generate_image`（nanobanana）が使えますが、他のツールでも [MCP 経由の画像生成サーバー](https://zenn.dev/forward/articles/11a680c4b530ab)を利用すれば同様のアプローチが可能です。
+**⚠️ グローバルパスに関する注意**
+公式ドキュメント等ではグローバルスコープの配置先として `~/.gemini/antigravity/`（例: `~/.gemini/antigravity/skills/`）が記載されている場合がありますが、本記事で動作検証を行っている **Antigravity IDE V2 / Version 2.0.3+** の環境では、グローバルな設定やカスタム Workflow / Skill のアセットが `~/.gemini/config/` 配下に集約される仕様となっています。古いバージョンなど、お使いの環境の仕様に合わせて、適宜 `~/.gemini/antigravity/` 等にパスを読み替えて配置を行ってください。
 :::
+
+Workflow × Skill の設計パターン自体は GitHub Copilot や Claude Code 等にも応用可能です。画像生成については、Antigravity ではビルトインの `generate_image` がそのまま使用可能ですが、他のツールでも [MCP 経由の画像生成サーバー](https://zenn.dev/forward/articles/11a680c4b530ab)などを利用すれば同様のアプローチを実現できます。
 
 ## Before / After
 
@@ -65,11 +72,6 @@ Antigravity の **Workflow** と **Skill** には、それぞれ適用範囲に�
 *   **Workflowの配置先**: `~/.gemini/config/global_workflows/`
 *   **Skillの配置先**: `~/.gemini/config/skills/`
 
-:::message
-**⚠️ グローバルパスに関する注意**
-公式ドキュメント等ではグローバルスコープの配置先として `~/.gemini/antigravity/skills/` や `~/.gemini/antigravity/global_workflows/` が紹介されている場合がありますが、本動作検証環境（Antigravity IDE 2.0.3+）では `~/.gemini/config/` 配下に設定ファイルやカスタム資産が集約される仕様になっています。お使いの環境やバージョンに応じて、適宜パスを `~/.gemini/antigravity/` 等に読み替えてご対応ください。
-:::
-
 今回はどのプロジェクトでも再利用できるように、すべて **グローバルスコープ** に配置しています。
 
 ```
@@ -94,14 +96,6 @@ Antigravity の **Workflow** と **Skill** には、それぞれ適用範囲に�
 | **Workflow** (`create-diagram`) | 全体の対話プロセス制御<br>（要件整理 ➔ レビュー ➔ レンダリング） | ユーザーは `/create-diagram` コマンドを1度叩くだけでよく、スマートな対話型UI（UX）を提供できる。 |
 | **Skill 1** (`mermaid-generation`) | バグのない Mermaid コード生成のルール<br>（エイリアス使用、英語表記等） | Mermaid 構文の専門知識が Workflow から隠蔽され、コード文書化等の別の Workflow でも簡単に再利用できる。 |
 | **Skill 2** (`diagram-rendering`) | プレゼン向けデザインのガイドライン<br>（ドメイン配色、`generate_image` 用プロンプト） | グラフィック表現のノウハウが独立し、既存の Mermaid コードを一括画像化する別の Workflow などで再利用できる。 |
-
-:::message
-**参考リンク**
-- [AgentSkills.io — エージェントスキルの共有プラットフォーム](https://agentskills.io/)
-- [Antigravity Docs](https://antigravity.google/docs/getting-started)
-- [Skills ドキュメント](https://antigravity.google/docs/skills)
-- [MCP ドキュメント](https://antigravity.google/docs/mcp)
-:::
 
 ---
 
@@ -382,3 +376,13 @@ Messages (horizontal arrows between lifelines with labels above them in dark gra
 | **統合型 Workflow × Skill** | **✅** | **✅** | **✅** | **✅** |
 
 単に AI に「描いて」とお願いするだけではなく、**「プロセスは Workflow で対話的に統合し、専門知識は役割ごとに Skill へきれいに分離する」**。これこそが、Antigravity などの先進的なエージェント環境を最大限に活かすベストプラクティスです。ぜひ日々の技術発信や資料作成にお役立てください！
+
+---
+
+## 参考リンク
+
+*   [AgentSkills.io — エージェントスキルの共有プラットフォーム](https://agentskills.io/)
+*   [Antigravity Docs](https://antigravity.google/docs/getting-started)
+*   [Skills ドキュメント](https://antigravity.google/docs/skills)
+*   [MCP ドキュメント](https://antigravity.google/docs/mcp)
+*   [【Claude Codeから画像生成】画像生成MCPを作ってnpmに公開した](https://zenn.dev/forward/articles/11a680c4b530ab)
