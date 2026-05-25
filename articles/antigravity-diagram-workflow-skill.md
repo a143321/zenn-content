@@ -10,7 +10,7 @@ published: true
 
 技術プレゼンでシーケンス図を作るとき、こんな経験はないでしょうか：
 
-- Mermaid.js で書いたら文字切れが発生
+- Mermaid（標準の記法）で書いたら文字切れが発生
 - AIに「図を描いて」と言ったら、毎回色もレイアウトもバラバラ
 - 結局 PowerPoint で手書き…
 
@@ -33,22 +33,22 @@ published: true
 
 Workflow × Skill の設計パターン自体は GitHub Copilot や Claude Code 等にも応用可能です。画像生成については、Antigravity ではビルトインの `generate_image` がそのまま使用可能ですが、他のツールでも [MCP 経由の画像生成サーバー](https://zenn.dev/forward/articles/11a680c4b530ab)などを利用すれば同様のアプローチを実現できます。
 
-## Before / After
+## 導入前後の比較（Before / After）
 
 まず結果から。同じ Mermaid コードから生成した図を比較します。
 
-### Before: Mermaid.js 直接レンダリング
+### 導入前：Mermaidの標準出力による直接描画
 
-![Before: Mermaid.js 直接レンダリング](/images/antigravity-diagram/before.png)
+![導入前：Mermaidの標準出力による直接描画](/images/antigravity-diagram/before.png)
 
 **問題点:**
 - パーティシパント名が長いと **文字切れ** が発生
 - 色は全パーティシパントで **同一テーマ** （個別指定不可）
 - レンダリング環境に品質が依存
 
-### After: Workflow × Skill で生成
+### 導入後：Workflow × Skill による安定生成
 
-![After: Workflow × Skill で生成](/images/antigravity-diagram/after.png)
+![導入後：Workflow × Skill による安定生成](/images/antigravity-diagram/after.png)
 
 **改善点:**
 - ✅ ドメイン別の **意味的な配色** で構造が一目瞭然
@@ -181,7 +181,7 @@ Antigravity のエージェントが使える画像生成ツールです。内�
 
 ### 1. Workflow: `/create-diagram`
 
-:::details global_workflows/create-diagram.md のコードを見る
+:::details create-diagram.md のコードを見る
 
 ```markdown
 ---
@@ -222,7 +222,7 @@ description: 技術トピックからシーケンス図を作成し、プレゼ�
 
 ### 2. Skill 1: `mermaid-generation`
 
-:::details skills/mermaid-generation/SKILL.md のコードを見る
+:::details mermaid-generation/SKILL.md のコードを見る
 
 ```markdown
 ---
@@ -281,7 +281,7 @@ sequenceDiagram
 
 ### 3. Skill 2: `diagram-rendering`
 
-:::details skills/diagram-rendering/SKILL.md のコードを見る
+:::details diagram-rendering/SKILL.md のコードを見る
 
 ```markdown
 ---
@@ -371,7 +371,7 @@ Messages (horizontal arrows between lifelines with labels above them in dark gra
 | 手法 | 一貫性 | 再現性 | 環境非依存 | ユーザーUX |
 |:--|:--:|:--:|:--:|:--:|
 | 手動（PowerPoint等） | ✅ | ❌ | ✅ | ❌ |
-| Mermaid.js 直接出力 | ❌ | ✅ | ❌ | 🔺 |
+| Mermaid標準機能での直接出力 | ❌ | ✅ | ❌ | 🔺 |
 | AI に都度プロンプト指示 | ❌ | ❌ | ✅ | 🔺 |
 | **統合型 Workflow × Skill** | **✅** | **✅** | **✅** | **✅** |
 
